@@ -1,7 +1,7 @@
 import cas
-from allauth.account.adapter import get_adapter
+from allauth.account.adapter import get_adapter as get_account_adapter
 from allauth.account.utils import get_next_redirect_url
-from allauth.socialaccount import providers
+from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.helpers import (
     complete_social_login,
     render_authentication_error,
@@ -51,12 +51,22 @@ class CASAdapter:
         """
         return CAS_PROVIDER_SESSION_KEY in self.request.session
 
+    # @cached_property
+    # def provider(self):
+    #     """
+    #     Returns a provider instance for the current request.
+    #     """
+    #     return providers.registry.by_id(self.provider_id, self.request)
+
+    # cf allauth oauth2 adapter
+    # https://github.com/pennersr/django-allauth/blob/
+    # 89c58206be69063886dbc263290c28acd924b94c/allauth/socialaccount/providers/oauth2/views.py#L45
     @cached_property
     def provider(self):
-        """
-        Returns a provider instance for the current request.
-        """
-        return providers.registry.by_id(self.provider_id, self.request)
+        return get_adapter(self.request).get_provider(
+            self.request,
+            provider=self.provider_id,
+        )
 
     def complete_login(self, request, response):
         """
@@ -240,6 +250,6 @@ class CASLogoutView(CASView):
         Returns the url to redirect after logout.
         """
         request = self.request
-        return get_next_redirect_url(request) or get_adapter(
+        return get_next_redirect_url(request) or get_account_adapter(
             request
         ).get_logout_redirect_url(request)

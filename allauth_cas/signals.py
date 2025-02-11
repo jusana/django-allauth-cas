@@ -1,6 +1,6 @@
-from allauth.account.adapter import get_adapter
+from allauth.account.adapter import get_adapter as get_account_adapter
 from allauth.account.utils import get_next_redirect_url
-from allauth.socialaccount import providers
+from allauth.socialaccount.adapter import get_adapter
 from django.contrib.auth.signals import user_logged_out
 from django.dispatch import receiver
 
@@ -14,12 +14,13 @@ def cas_account_logout(sender, request, **kwargs):
     if not provider_id:
         return
 
-    provider = providers.registry.by_id(provider_id, request)
+    # provider = providers.registry.by_id(provider_id, request)
+    provider = get_adapter(request).get_provider(request, provider=provider_id)
 
     if not provider.message_suggest_caslogout_on_logout(request):
         return
 
-    next_page = get_next_redirect_url(request) or get_adapter(
+    next_page = get_next_redirect_url(request) or get_account_adapter(
         request
     ).get_logout_redirect_url(request)
 

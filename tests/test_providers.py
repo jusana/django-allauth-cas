@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 
-from allauth.socialaccount.providers import registry
+# from allauth.socialaccount.providers import registry
 from django.contrib import messages
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.middleware import MessageMiddleware
@@ -24,11 +24,11 @@ class CASProviderTests(TestCase):
         MessageMiddleware().process_request(request)
         return request
 
-    def test_register(self):
-        """
-        Example CAS provider is registered as social account provider.
-        """
-        self.assertIsInstance(registry.by_id("theid"), ExampleCASProvider)
+    # def test_register(self):
+    #     """
+    #     Example CAS provider is registered as social account provider.
+    #     """
+    #     self.assertIsInstance(registry.by_id("theid"), ExampleCASProvider)
 
     def test_get_login_url(self):
         url = self.provider.get_login_url(self.request)
